@@ -42,10 +42,15 @@ const routes = [
         name: 'Abogados',
         component: () => import('@/views/m_abogados/index.vue'),
       },
+      {
+        path:'/clientes',
+        name: 'Clientes',
+        component: () => import('@/views/m_clientes/index.vue'),
+      },
     ],
   },
 
-   
+
 
 ]
 

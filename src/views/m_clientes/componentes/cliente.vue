@@ -78,11 +78,6 @@
           </select>
         </div>
 
-        <div class="col-md-6" >
-          <label for="">Codigo de acceso</label>
-          <input type="text" class="form-control" v-model="codigoacceso" required >
-        </div>
-
         <div class="mt-3 mb-3" >
             <ul>
                 <li   v-for="(error , i) in listaerrores" :key="i" class="text-danger">{{ error }}</li>
@@ -90,7 +85,7 @@
         </div>
 
         <div class="col-md-12 mt-3 mb-3 d-flex justify-content-end" >
-          <CButton color="secondary" class="text-light"  @click="$emit('cerrarModalAbg')">
+          <CButton color="secondary" class="text-light"  @click="$emit('cerrarModalCli')">
             Cancelar
           </CButton>
           <button class="btn btn-info text-light" type="submit" >Guardar</button>
@@ -103,13 +98,15 @@
   <ModalError  @cerrarModalError="cerrarError()" v-if="modal_error" :estado="modal_error" :mensaje="mensaje"   />
 
 </template>
+
 <script>
+
 import { ruta_servidor , postFetch  } from '../../../helpers/contantes.js'
 import ModalOk from '../../componentes/modalOk.vue'
 import ModalError from '../../componentes/modalError.vue'
 
 export default {
-  name:'Abogado',
+  name:'Cliente',
   components:{
     ModalOk,
     ModalError
@@ -131,23 +128,24 @@ export default {
       modal_ok:false,
       modal_error:false,
       mensaje:'',
-      idAbg:'',
+      idCli:'',
       idPersona:'',
       estado:''
     };
   },
   mounted(){
+    console.log(this.id)
     if( this.tipo == 'EDITAR' ){
-      this.idAbg =  this.id
+      this.idCli =  this.id
       this.traerDatos()
     }
-
   },
   methods:{
     enviarformulario(e){
       e.preventDefault();
       if( this.validarCampos() )
       {
+
           let obj ={
             'nombre':this.nombres ,
             'apellido1':  this.appaterno  ,
@@ -160,9 +158,9 @@ export default {
             'estadocivil': this.estadocivil ,
             'tipopersona':  this.tipopersona ,
             'codigo': this.codigoacceso  ,
-            'id': this.idAbg ,
+            'id': this.idCli ,
             'idpersona': this.idPersona  ,
-            'estado':this.estado,
+            'estado':this.estado==''?1:this.estado,
             }
           if( this.tipo == 'EDITAR' ){
             this.editar(obj)
@@ -173,12 +171,12 @@ export default {
       }
     },
     traerDatos(){
-          let obj={ 'id':this.idAbg }
-        postFetch( ruta_servidor+'abogados/buscar', obj  )
+          let obj={ 'id':this.idCli }
+        postFetch( ruta_servidor+'clientes/buscar', obj  )
         .then((res)=>{
             console.log(res)
              if( res.success ){
-                let datos = res.abogado
+                let datos = res.cliente
                 this.nombres = datos.nombre
                 this.appaterno = datos.appaterno
                 this.apmaterno = datos.apmaterno
@@ -199,7 +197,7 @@ export default {
         })
     },
     agregar(obj){
-        postFetch( ruta_servidor+'abogados/agregar',obj )
+        postFetch( ruta_servidor+'clientes/agregar',obj )
           .then((res)=>{
             console.log( res );
             this.listaerrores = []
@@ -214,7 +212,7 @@ export default {
           })
     },
     editar( obj ){
-      postFetch( ruta_servidor+'abogados/actualizar',obj )
+      postFetch( ruta_servidor+'clientes/actualizar',obj )
           .then((res)=>{
             console.log( res );
             this.listaerrores = []
@@ -231,7 +229,7 @@ export default {
     },
     validarCampos(){
       if(  this.nombres!='' && ( this.appaterno!='' || this.apmaterno != '' ) && this.ci !='' &&
-          this.celular != '' && this.direccion != '' && this.fechanacimiento != '' && this.codigoacceso != ''
+          this.celular != '' && this.direccion != '' && this.fechanacimiento != ''
       ){
         return true
       }else{
@@ -240,7 +238,7 @@ export default {
     },
     cerrarOk(){
       this.modal_ok = false
-      this.$emit('cerrarModalAbg')
+      this.$emit('cerrarModalCli')
     },
     abrirOk(mensaje_modal){
        this.mensaje = mensaje_modal

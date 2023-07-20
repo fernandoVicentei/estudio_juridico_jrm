@@ -3,10 +3,10 @@
     <CCol>
       <CCard class="mb-4">
         <CCardBody>
-          <strong>Gestion de abogados</strong>
+          <strong>Gestion de Abogados</strong>
           <div class="row" >
               <div class="col-md-4 mt-4 mb-1" >
-                <button  class="btn btn-info text-light" @click="() => { mostrarModal = true }">Agregar</button>
+                <button  class="btn btn-info text-light" @click="abrirModal( 'AGREGAR' ,0)">Agregar</button>
               </div>
               <div class="col-md-12  " >
                   <div class="table-responsive" >
@@ -31,11 +31,11 @@
                                   <td> {{ abogado.estadocivil }} </td>
                                   <td> {{  abogado.codigo }} </td>
                                   <td>
-                                    <button class="btn btn-warning">
+                                    <button class="btn btn-warning" @click="abrirModal('EDITAR',abogado.id)"  >
                                       <CIcon :icon="cilClipboard" size="md"   />
                                     </button>
                                     <button class="btn btn-danger" >
-                                      <CIcon :icon="cilTrash" size="md"  />
+                                      <CIcon :icon="cilTrash" size="md" @click="abrirModal('ELIMINAR',abogado.id)" />
                                     </button>
                                   </td>
                               </tr>
@@ -49,7 +49,12 @@
     </CCol>
   </CRow>
 
-  <Modal :vermodal="mostrarModal" @cerrarModalAbogado="cerrarModal()"  />
+  <Modal :vermodal="mostrarModal"
+    :listaTipos="listaTipoPersonas"
+    :idAbogado="idAbg"
+    :tituloModal="tituloModal"
+    :tipoAccion="tipoAccion"
+     @cerrarModalAbogado="cerrarModal()"  />
 
 </template>
 
@@ -69,11 +74,16 @@ export default {
     return {
       cilList,cilShieldAlt, cilTrash , cilClipboard,
       listaAbogados:[],
+      listaTipoPersonas:[],
       mostrarModal:false,
+      tipoAccion:'',
+      idAbg:'',
+      tituloModal:''
     };
   },
   mounted(){
     this.retornarAbogados()
+    this.retornarTipoPersonas()
   },
   methods: {
       retornarAbogados(){
@@ -86,9 +96,35 @@ export default {
             console.log(err);
           })
       },
+      abrirModal(tipo,id){
+        if( tipo=='AGREGAR' ){
+          this.tituloModal='NUEVO REGISTRO'
+        }else{
+          this.tituloModal='EDITAR REGISTRO'
+        }
+
+        this.tipoAccion = tipo
+        this.idAbg =  id
+        this.mostrarModal = true
+      },
       cerrarModal(){
         this.mostrarModal= false
+        this.retornarAbogados()
       },
+      retornarTipoPersonas(){
+        postFetch( ruta_servidor+'tipopersona/listado', null )
+        .then((res)=>{
+          console.log(res);
+          if(res.success){
+            this.listaTipoPersonas =  res.listado_personas
+          }else{
+
+          }
+        })
+        .catch((err)=>{
+          console.log(err);
+        })
+      }
 
   },
 

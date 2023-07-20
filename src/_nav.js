@@ -17,6 +17,12 @@ export default [
   },
   {
     component: 'CNavItem',
+    name: 'Clientes',
+    to: '/clientes',
+    icon: 'cil-drop',
+  },
+  {
+    component: 'CNavItem',
     name: 'Typography',
     to: '/theme/typography',
     icon: 'cil-pencil',
@@ -43,6 +49,6 @@ export default [
         to: '/notifications/modals',
       },
     ],
-    
+
   },
 ]

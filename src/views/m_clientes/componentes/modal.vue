@@ -1,17 +1,18 @@
 <template>
-  <CModal backdrop="static" :visible="vermodal" @close="$emit('cerrarModalAbogado')">
+  <CModal backdrop="static" :visible="vermodal" @close="$emit('cerrarModalCliente')">
     <CModalHeader>
       <CModalTitle>{{ tituloModal }}</CModalTitle>
     </CModalHeader>
     <CModalBody>
 
-        <Abogado  @cerrarModalAbg="cerrarModal()"
-        :id="idAbogado"
+       <Cliente  @cerrarModalCli="cerrarModal()"
+        :id="idCliente"
         v-if=" tipoAccion == 'AGREGAR' || tipoAccion == 'EDITAR' "
         :listaTipoPersona="listaTipos" :tipo="tipoAccion"  />
 
+
       <Eliminar
-        :id="idAbogado"
+        :id="idCliente"
         @cerrarModalEliminar="cerrarModal()"
         v-if=" tipoAccion != 'AGREGAR' && tipoAccion != 'EDITAR' "  />
 
@@ -21,25 +22,29 @@
 </template>
 
 <script>
-
-import Abogado from './abogado.vue'
+import Cliente from './cliente.vue'
 import Eliminar from './eliminar.vue'
 
 
 export default {
   name: 'Modal',
   components:{
-    Abogado,
+    Cliente,
     Eliminar,
   },
   data(){
     return {
-
+      idCli:''
     };
+  },
+  mounted(){
+
+    this.idCli = this.idCliente
+    
   },
   methods:{
     cerrarModal(){
-      this.$emit('cerrarModalAbogado')
+      this.$emit('cerrarModalCliente')
     },
   },
   props:{
@@ -52,7 +57,7 @@ export default {
     listaTipos:{
       type:Array
     },
-    idAbogado:{
+    idCliente:{
       required: false,
     },
     tipoAccion:{
