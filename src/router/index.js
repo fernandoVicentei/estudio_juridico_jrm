@@ -1,5 +1,5 @@
 import { h, resolveComponent } from 'vue'
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHashHistory ,  } from 'vue-router'
 
 import DefaultLayout from '@/layouts/DefaultLayout'
 
@@ -47,12 +47,27 @@ const routes = [
         name: 'Clientes',
         component: () => import('@/views/m_clientes/index.vue'),
       },
+      {
+        path:'/tramites',
+        name: 'Tramites',
+        component: () => import('@/views/m_tramites/index.vue'),
+      },
+      {
+        path: '/tramites/registrar',
+        name: 'RegistrarTramite',
+        component: () => import('@/views/m_tramites/componentes/registrar.vue'),
+      },
+      {
+        path: '/tramites/actualizar/:idTramite',
+        name: 'EditarTramite',
+        component: () => import('@/views/m_tramites/componentes/registrar.vue'),
+      },
+
     ],
   },
 
-
-
 ]
+
 
 const router = createRouter({
   history: createWebHashHistory(process.env.BASE_URL),
@@ -61,5 +76,6 @@ const router = createRouter({
     return { top: 0 }
   },
 })
+
 
 export default router

@@ -1,5 +1,5 @@
 <template>
-    <CModal backdrop="static " alignment="center" :visible="visible" @close="$emit('cerrarModalOk')">
+    <CModal backdrop="static" alignment="center" :visible="visible" @close="$emit('cerrarModalOk')">
     <CModalHeader>
       <CModalTitle>INFORMACION</CModalTitle>
     </CModalHeader>
@@ -29,7 +29,6 @@ export default {
     this.visible =  this.estado
   },
   methods:{
-
   },
   props:{
     estado:{
