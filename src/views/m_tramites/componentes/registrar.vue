@@ -5,7 +5,7 @@
         <CCardBody>
 
             <h4 v-if="idTramite==''" >Iniciar Tramite</h4>
-            <h4 v-else >Actualizar Tramite</h4>
+            <h4 v-else > {{ textoTitulo }} </h4>
 
             <form  @submit="validarDatos" >
 
@@ -13,7 +13,8 @@
               <div class="row mt-3 mb-2" >
                   <div class="col-md-3 mt-1" >
                       <span>Fecha de Registro</span>
-                      <input type="date" class="form-control" v-model="fechaRegistro" :disabled="bloquearComponentes"  required>
+                      <input type="date" class="form-control"
+                        v-model="fechaRegistro" :disabled="bloquearComponentes"  required>
                   </div>
                   <div class="col-md-3 mt-1" >
                       <span>Abogado Asignado</span>
@@ -133,12 +134,10 @@
         <ModalOk  @cerrarModalOk="cerrarOk()" v-if="modalOk" :estado="modalOk" :mensaje="mensaje"   />
         <ModalError  @cerrarModalError="cerrarError()" v-if="modalError" :estado="modalError" :mensaje="mensaje"   />
 
-
       </CCard>
     </div>
   </div>
 </template>
-
 
 <script>
 
@@ -174,13 +173,16 @@ export default {
       listaJuzgados:[],
       listaTipoTramites:[],
       listaTipoPretenciones:[],
-      idTramite:'',
-      listaErrores:[],
-      bloquearComponentes:false,
+      idTramite: '' ,
+      listaErrores: [] ,
+      bloquearComponentes: false ,
 
-      modalOk: false  ,
-      modalError:false,
-      mensaje:''
+      modalOk: false ,
+      modalError: false ,
+      mensaje: '' ,
+      editar: false ,
+      textoTitulo:'Recargando Tramite ...',
+      contadorIntentos:0,
     };
   },
   mounted(){
@@ -189,20 +191,60 @@ export default {
     this.cargarJuzgados()
     this.cargarTipoTramites()
     this.cargarTipoPretenciones()
-
     this.idTramite= this.$route.params.idTramite
     this.bloquearComponentes = this.idTramite==''?false:true
-
+    this.traerTramite()
   },
   methods:{
+      traerTramite(){
+        let obj = {idTramite: this.idTramite}
+        postFetch( ruta_servidor + 'tramite/buscar', obj )
+        .then(res=>{
+            console.log(res)
+            if(res.status == 200)
+            {
+                let resultados = res.tramite
+
+                this.fechaRegistro = resultados.fecha
+                this.codAbogado =  resultados.abogado_id
+                this.codCliente = resultados.cliente_id
+                this.codJuzgado = resultados.juzgado_id
+                this.fechaSucesos =  resultados.fechaSuceso
+                this.sucesosOcurridos = resultados.hechosOcurridos
+                this.codTipoTramite =  resultados.tipoproceso_id
+                this.presupuestoInicial = resultados.monto
+                this.obsPresupuesto =  resultados.asunto
+                this.declaracionCliente = resultados.detalleCliente
+                this.declaracionImplicado = resultados.detalleDemandado
+                this.codTipoPretencion =  resultados.tipopretencion_id
+                this.valorMedida =  resultados.valorMedida
+                this.pretencionCliente =  resultados.detallePretencionDemandante
+                this.pretencionImplicado = resultados.detallePretencionDemandado
+                this.textoTitulo = 'Actualizar Tramite'
+            }else{
+              console.log('error')
+            }
+
+        })
+        .catch((e)=>{
+          this.mensaje="Ocurrio un problema al obtener los datos del tramite. "+e.message
+          this.mostrarError()
+        })
+      },
+
       validarDatos(e){
         e.preventDefault();
         this.listaErrores= []
         if( this.idTramite == '' ){
           this.registrarTramite()
+        }else{
+          this.editarTramite()
         }
       },
-      registrarTramite(){
+
+      registrarTramite()
+      {
+
         let data = this.prepararDatos()
         postFetch( ruta_servidor+ 'tramite/agregar', data)
         .then(res=>{
@@ -223,6 +265,29 @@ export default {
         })
 
       },
+      editarTramite(){
+
+        let data = this.prepararDatos()
+        data.idTramite = this.idTramite
+
+        postFetch( ruta_servidor +'tramite/editar' ,data )
+        .then(res=>{
+            console.log(res)
+            if(res.status == 200 ){
+              this.mensaje =  'El tramite fue actualizado correctamente'
+               this.mostrarOk()
+            }else if(res.status == 422) {
+              this.listaErrores = res.errors
+            }else{
+              this.mensaje="Ocurrio un problema al guardar el registro. "+e.message
+              this.mostrarError()
+            }
+        })
+        .catch((e)=>{
+          console.log(e)
+        })
+
+      },
       prepararDatos(){
         let obj = {
           fecha: this.fechaRegistro ,
@@ -240,7 +305,8 @@ export default {
           asunto : this.obsPresupuesto  ,
           detallePretencionDemandado : this.pretencionImplicado,
           detallePretencionCliente: this.pretencionCliente   ,
-          juzgado_id: this.codJuzgado
+          juzgado_id: this.codJuzgado,
+          idTramite:0,
         }
         return obj
       },
@@ -313,7 +379,7 @@ export default {
          let idTT= this.codTipoTramite
          let obj =  this.listaTipoTramites.find(e => e.id === idTT)
          this.presupuestoInicial = obj.precioinicial
-         
+
       },
       cancelar(){
         this.$router.push('/tramites');
@@ -322,6 +388,7 @@ export default {
         this.modalOk= false
         document.body.style.overflow = 'auto';
         this.$router.push('/tramites');
+
       },
       mostrarOk(){
         this.modalOk = true
@@ -329,13 +396,21 @@ export default {
       cerrarError(){
         this.modalError = false
         document.body.style.overflow = 'auto';
+        if( this.idTramite != '' ){
+           this.textoTitulo = 'Recargando Tramite'
+           this.traerTramite()
+          if( this.contadorIntentos == 3 ){
+            this.$router.push('/tramites');
+          }
+          this.contadorIntentos+=1
+        }
+
       },
       mostrarError(){
         this.modalError = true
-      }
-
-
+      },
 
   },
 }
+
 </script>

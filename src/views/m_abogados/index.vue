@@ -87,7 +87,7 @@ export default {
   },
   methods: {
       retornarAbogados(){
-          postFetch( ruta_servidor+'abogados/retornarabogados', null )
+          postFetch( ruta_servidor+'abogados/retornarAbogados', null )
           .then(res=>{
             console.log( res)
              this.listaAbogados =  res.abogados
