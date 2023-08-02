@@ -62,6 +62,11 @@ const routes = [
         name: 'EditarTramite',
         component: () => import('@/views/m_tramites/componentes/registrar.vue'),
       },
+      {
+        path: '/tramites/tipotramites',
+        name: 'TipoTramite',
+        component: () => import('@/views/m_tramites/tipotramite.vue'),
+      },
 
     ],
   },

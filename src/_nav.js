@@ -29,6 +29,12 @@ export default [
   },
   {
     component: 'CNavItem',
+    name: 'TipoTramite',
+    to: '/tramites/tipotramites',
+    icon: 'cil-drop',
+  },
+  {
+    component: 'CNavItem',
     name: 'Typography',
     to: '/theme/typography',
     icon: 'cil-pencil',
