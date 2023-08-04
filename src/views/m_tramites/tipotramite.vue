@@ -118,6 +118,7 @@ export default {
       cerrarModal(){
         this.mostrarModal = false
         this.tituloModal = 'Registrar Tipo Tramite'
+        this.retornarDatos()
       }
 
 

@@ -1,6 +1,5 @@
 <template>
-
-    <form >
+    <form  @submit="enviarFormulario" >
         <div class="row" >
           <div class="col-md-12" >
             <label for="">Nombre</label>
@@ -33,18 +32,25 @@
             <button class="btn btn-secondary text-light"  @click="$emit('cerrarModal')" >Cancelar</button>
             <button class="btn btn-info text-light" type="submit" >Guardar</button>
         </div>
-
         </div>
     </form>
+
+  <ModalOk  @cerrarModalOk="cerrarOk()" v-if="modal_ok" :estado="modal_ok" :mensaje="mensaje"   />
+  <ModalError  @cerrarModalError="cerrarError()" v-if="modal_error" :estado="modal_error" :mensaje="mensaje"   />
+
 
 </template>
 
 <script>
 
+import ModalOk from '../../componentes/modalOk.vue'
+import ModalError from '../../componentes/modalError.vue'
+import { ruta_servidor , postFetch  } from '../../../helpers/contantes.js'
+
 export default {
   name:'RTTramite',
   components:{
-
+    ModalOk, ModalError
   },
   data(){
     return {
@@ -52,10 +58,65 @@ export default {
       descripcion:'',
       precio:'',
       listaerrores:[],
-
+      modal_ok:false,
+      modal_error:false,
+      mensaje:'',
+      idTramite:0,
     }
   },
+  mounted(){
+    this.idTramite = this.tramiteId
+  },
   methods:{
+        enviarFormulario(e){
+          console.log( this.idTramite )
+          let obj ={
+            'nombre':this.nombre ,
+            'descripcion':  this.descripcion  ,
+            'precio': this.precio ,
+            }
+          if( this.idTramite == '' || this.idTramite == 0 || this.idTramite == null ){
+            this.registrarTTramite( obj )
+          }else{
+
+
+          }
+           e.preventDefault();
+
+        },
+        registrarTTramite(data){
+          postFetch( ruta_servidor+'tipotramites/agregar', data )
+          .then((res)=>{
+            console.log( res );
+            this.listaerrores = []
+              if(res.status == 422){
+                  this.listaerrores =  res.errors
+              }else{
+                  this.abrirOk('El registro se guardo correctamente.')
+              }
+          })
+          .catch((err)=>{
+            this.abrirError(err.message)
+          })
+        },
+        editarTTramite(data){
+
+        },
+        abrirOk(mensaje){
+          this.mensaje = mensaje
+          this.modal_ok = true
+        },
+        abrirError(mensaje){
+          this.mensaje = mensaje
+          this.modal_error= true
+        },
+        cerrarOk(){
+          this.modal_ok = false
+          this.$emit('cerrarModal')
+        },
+        cerrarError(){
+          this.modal_error = false
+        },
 
   },
   props:{
