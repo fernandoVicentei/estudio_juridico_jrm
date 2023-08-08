@@ -3,10 +3,10 @@
     <CCol>
       <CCard class="mb-4">
         <CCardBody>
-          <strong>Gestion de Tramites</strong>
+          <strong>Gestion de Juzgados </strong>
           <div class="row" >
               <div class="col-md-4 mt-4 mb-1" >
-                <button  class="btn btn-info text-light" @click="registrarTramite()">Iniciar Tramite</button>
+                <button  class="btn btn-info text-light" @click="abrirModal( 'AGREGAR' ,0)">Agregar</button>
               </div>
               <div class="col-md-12  " >
                   <div class="table-responsive" >
@@ -14,31 +14,30 @@
                           <thead class="bg-info text-light" >
                               <tr>
                                 <th>Cod</th>
-                                <th>Abogado (Asignado)</th>
-                                <th>Cliente</th>
-                                <th>Fecha Iniciada</th>
-                                <th>Descripcion</th>
+                                <th>Nombre Entidad</th>
+                                <th>Direccion</th>
                                 <th>Estado</th>
                                 <th></th>
                               </tr>
                           </thead>
                           <tbody>
-                              <tr v-for="(tramite) in listaTramites " :key="tramite.id" >
-                                  <td>{{  tramite.id }}</td>
-                                  <td>{{  tramite.abogado  }} </td>
-                                  <td>{{ tramite.cliente }}</td>
-                                  <td> {{  tramite.fecha }} </td>
-                                  <td> {{ tramite.hechosOcurridos }} </td>
+                              <tr v-for="(juzgado, i) in listaJuzgados" :key="juzgado.id" >
+                                  <td>{{  i+1 }}</td>
+                                  <td>{{  juzgado.nombre  }} </td>
+                                  <td>{{ juzgado.direccion}}</td>
                                   <td>
-                                    <CBadge color="success" v-if="tramite.estado==1"  >EN CURSO</CBadge>
-                                    <CBadge color="info" v-else-if="tramite.estado==2"  >FINALIZADO</CBadge>
-                                    <CBadge color="secondary" v-else  >CERRADO</CBadge>
+                                      <CBadge v-if="juzgado.estado==0"  color="danger">
+                                          INACTIVO
+                                      </CBadge>
+                                      <CBadge v-else color="info">
+                                          ACTIVO
+                                      </CBadge>
                                   </td>
                                   <td>
-                                    <button class="btn btn-warning" @click="editarTramite(tramite.id)"  >
+                                    <button class="btn btn-warning" @click="abrirModal('EDITAR',juzgado.id)"  >
                                       <CIcon :icon="cilClipboard" size="md"   />
                                     </button>
-                                    <button class="btn btn-danger text-light" @click="abrirModal('ELIMINAR',tramite.id)" >
+                                    <button class="btn btn-danger" @click="abrirModal('ELIMINAR',juzgado.id)" >
                                       <CIcon :icon="cilTrash" size="md"  />
                                     </button>
                                   </td>
@@ -53,7 +52,12 @@
     </CCol>
   </CRow>
 
-
+  <Modal
+    :vermodal="mostrarModal"
+    :idJuzgado="idJuzgados"
+    :tituloModal="tituloModal"
+    :tipoAccion="tipoAccion"
+     @cerrarModalJuzgado="cerrarModal()"  />
 
 </template>
 
@@ -64,7 +68,7 @@ import { ruta_servidor , postFetch  } from '../../helpers/contantes.js'
 import Modal from './componentes/modal.vue'
 
 export default {
-  name: 'Tramites',
+  name: 'Juzgados',
   components: {
     CIcon,
     Modal
@@ -72,48 +76,46 @@ export default {
   data(){
     return {
       cilList,cilShieldAlt, cilTrash , cilClipboard,
-      listaTramites:[],
+      listaJuzgados:[],
       mostrarModal:false,
       tipoAccion:'',
-      idAbg:'',
+      idJuzgados:'',
       tituloModal:''
     };
   },
   mounted(){
-    this.retornarTramites()
+    this.retornarJuzgados()
   },
   methods: {
-      retornarTramites(){
-          postFetch( ruta_servidor+'tramite/listar', null )
+      retornarJuzgados(){
+          postFetch( ruta_servidor+'juzgado/retornarjuzgados', null )
           .then(res=>{
-            console.log( res)
-            this.listaTramites = res.tramites
+            this.listaJuzgados =  res.juzgados
           })
           .catch(err=>{
             console.log(err);
           })
       },
-      abrirModal(tipo,id)
-      {
+      abrirModal(tipo,id){
         if( tipo=='AGREGAR' ){
           this.tituloModal='NUEVO REGISTRO'
-        }else{
+        }else if(  tipo=='EDITAR' ){
           this.tituloModal='EDITAR REGISTRO'
+        }else{
+          this.tituloModal = 'ELIMINAR REGISTRO'
         }
         this.tipoAccion = tipo
-        this.idAbg =  id
+        this.idJuzgados =  id
         this.mostrarModal = true
-      },
-      editarTramite(id){
-        this.$router.push(`/tramites/actualizar/${id}`);
       },
       cerrarModal(){
         this.mostrarModal= false
-        this.retornarClientes()
+        this.retornarJuzgados()
       },
-      registrarTramite(){
-        this.$router.push('/tramites/registrar');
-      },
+
+
   },
+
+
 }
 </script>

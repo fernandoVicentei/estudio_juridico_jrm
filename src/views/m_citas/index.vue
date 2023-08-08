@@ -3,7 +3,7 @@
     <CCol>
       <CCard class="mb-4">
         <CCardBody>
-          <strong>Gestion de Clientes</strong>
+          <strong>Gestion de Reuniones </strong>
           <div class="row" >
               <div class="col-md-4 mt-4 mb-1" >
                 <button  class="btn btn-info text-light" @click="abrirModal( 'AGREGAR' ,0)">Agregar</button>
@@ -14,30 +14,34 @@
                           <thead class="bg-info text-light" >
                               <tr>
                                 <th>Cod</th>
-                                <th>Nombre Completo</th>
-                                <th>Carnet</th>
-                                <th>Celular/Telefono</th>
-                                <th>Estado Civil</th>
-                                <th>Estado</th>
+                                <th>Abogado Responsable</th>
+                                <th>Cliente</th>
+                                <th>Asunto</th>
+                                <th>Cod. Proceso</th>
+                                <th>Fecha</th>
                                 <th></th>
                               </tr>
                           </thead>
                           <tbody>
-                              <tr v-for="(cliente, i) in listaClientes " :key="cliente.id" >
+                              <tr v-for="(cita, i) in listaCitas" :key="cita.id" >
                                   <td>{{  i+1 }}</td>
-                                  <td>{{  cliente.nombre  }} {{ cliente.appaterno  }} {{ cliente.apmaterno }}</td>
-                                  <td>{{ cliente.carnet }}</td>
-                                  <td> {{  cliente.celular }} </td>
-                                  <td> {{ cliente.estadocivil }} </td>
+                                  <td>{{  cita.nombre_abg  }} {{ cita.ap1_abg }} {{ cita.ap2_abg }}</td>
+                                  <td>{{  cita.nombre_cli  }} {{ cita.ap1_cli }} {{ cita.ap2_cli }}</td>
+                                  <td>{{ cita.asunto }}</td>
+                                  <td>{{ cita.cod_proceso }}</td>
                                   <td>
-                                    <CBadge color="success" v-if="cliente.estado==1"  >ACTIVO</CBadge>
-                                    <CBadge color="danger" v-else  >INACTIVO</CBadge>
+                                      <CBadge v-if="fechaMayor(cita.fecha)"  color="secondary">
+                                          {{ cita.fecha }}
+                                      </CBadge>
+                                      <CBadge v-else color="info">
+                                          {{ cita.fecha }}
+                                      </CBadge>
                                   </td>
-                                  <td>
-                                    <button class="btn btn-warning" @click="abrirModal('EDITAR',cliente.id)"  >
+                                  <td  >
+                                      <button class="btn btn-warning" @click="abrirModal('EDITAR',cita.id)"  :disabled="fechaMayor(cita.fecha)"  >
                                       <CIcon :icon="cilClipboard" size="md"   />
                                     </button>
-                                    <button class="btn btn-danger text-light"  @click="abrirModal('ELIMINAR',cliente.id)" >
+                                    <button class="btn btn-danger text-light" @click="abrirModal('ELIMINAR',cita.id)" >
                                       <CIcon :icon="cilTrash" size="md"  />
                                     </button>
                                   </td>
@@ -54,22 +58,22 @@
 
   <Modal
     :vermodal="mostrarModal"
-    :listaTipos="listaTipoPersonas"
-    :idCliente="idAbg"
+    :idCita="idCita"
     :tituloModal="tituloModal"
     :tipoAccion="tipoAccion"
-     @cerrarModalCliente="cerrarModal()"  />
+     @cerrarModalCita="cerrarModal()"  />
 
 </template>
 
 <script>
+
 import { CIcon } from '@coreui/icons-vue';
 import { cilList, cilShieldAlt , cilTrash  , cilClipboard} from '@coreui/icons';
 import { ruta_servidor , postFetch  } from '../../helpers/contantes.js'
 import Modal from './componentes/modal.vue'
 
 export default {
-  name: 'Clientes',
+  name: 'Reuniones',
   components: {
     CIcon,
     Modal
@@ -77,58 +81,52 @@ export default {
   data(){
     return {
       cilList,cilShieldAlt, cilTrash , cilClipboard,
-      listaClientes:[],
-      listaTipoPersonas:[],
+      listaCitas:[],
       mostrarModal:false,
       tipoAccion:'',
-      idAbg:'',
+      idCita:'',
       tituloModal:''
     };
   },
   mounted(){
-    this.retornarClientes()
-    this.retornarTipoPersonas()
+    this.retornarCitas()
   },
   methods: {
-      retornarClientes(){
-          postFetch( ruta_servidor+'clientes/retornarclientes', null )
+      fechaMayor(fecha){
+        let fechaactual =  new Date();
+        let fechacita=  new Date(fecha)
+        if( fechacita < fechaactual ){
+            return true
+        }else{
+          return false
+        }
+      },
+      retornarCitas(){
+          postFetch( ruta_servidor+'citas/retornar', null )
           .then(res=>{
-            console.log( res)
-             this.listaClientes =  res.clientes
+            this.listaCitas =  res.citas
           })
           .catch(err=>{
             console.log(err);
           })
       },
       abrirModal(tipo,id){
-
         if( tipo=='AGREGAR' ){
           this.tituloModal='NUEVO REGISTRO'
-        }else{
+        }else if(  tipo=='EDITAR' ){
           this.tituloModal='EDITAR REGISTRO'
+        }else{
+          this.tituloModal = 'ELIMINAR REGISTRO'
         }
         this.tipoAccion = tipo
-        this.idAbg =  id
+        this.idCita =  id
         this.mostrarModal = true
       },
       cerrarModal(){
         this.mostrarModal= false
-        this.retornarClientes()
+        this.retornarCitas()
       },
-      retornarTipoPersonas(){
-        postFetch( ruta_servidor+'tipopersona/listado', null )
-        .then((res)=>{
-          console.log(res);
-          if(res.success){
-            this.listaTipoPersonas =  res.listado_personas
-          }else{
 
-          }
-        })
-        .catch((err)=>{
-          console.log(err);
-        })
-      }
 
   },
 

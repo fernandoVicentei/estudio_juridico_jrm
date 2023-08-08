@@ -17,6 +17,7 @@
                                 <th>Nombre </th>
                                 <th>Descripcion</th>
                                 <th>Precio Inicial</th>
+                                <th>Estado</th>
                                 <th></th>
                               </tr>
                           </thead>
@@ -26,24 +27,29 @@
                                 <td> {{ ttramite.proceso }}  </td>
                                 <td> {{ ttramite.descripcion }} </td>
                                 <td class="" >
-
                                     <CBadge v-if="ttramite.precioinicial<=0"  color="warning">
                                         {{ ttramite.precioinicial }} bs.
                                     </CBadge>
                                     <CBadge v-else color="success">
                                         {{ ttramite.precioinicial }} bs.
                                     </CBadge>
-
+                                </td>
+                                <td>
+                                  <CBadge v-if="ttramite.estado==0"  color="danger">
+                                        INACTIVO
+                                    </CBadge>
+                                    <CBadge v-else color="info">
+                                        ACTIVO
+                                    </CBadge>
 
                                 </td>
                                 <td>
-                                    <button class="btn btn-warning"  >
-                                      <CIcon :icon="cilClipboard" size="md"   />
+                                    <button class="btn btn-warning"   @click="editarTramite(ttramite.id)"  >
+                                      <CIcon :icon="cilClipboard" size="md"    />
                                     </button>
-                                    <button class="btn btn-danger"   >
+                                    <button class="btn btn-danger" @click="eliminarTTamite(ttramite.id)"   >
                                       <CIcon :icon="cilTrash" size="md"  />
                                     </button>
-
                                 </td>
                               </tr>
                           </tbody>
@@ -63,7 +69,6 @@
     @cerrarModalTTramite="cerrarModal()"  />
 
 </template>
-
 
 <script>
 import { CIcon } from '@coreui/icons-vue';
@@ -110,6 +115,15 @@ export default {
       registrarTipoTramite(titulo)
       {
           this.abrirModal(titulo)
+      },
+      eliminarTTamite(idTT){
+        this.idTTramite = idTT
+          this.abrirModal('Eliminar Registro')
+      },
+      editarTramite(idTT)
+      {
+        this.idTTramite = idTT
+        this.abrirModal('Editar Tipo de tramite')
       },
       abrirModal(titulo){
          this.tituloModal= titulo

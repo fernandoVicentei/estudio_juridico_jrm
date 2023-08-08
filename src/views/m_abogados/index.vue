@@ -34,8 +34,8 @@
                                     <button class="btn btn-warning" @click="abrirModal('EDITAR',abogado.id)"  >
                                       <CIcon :icon="cilClipboard" size="md"   />
                                     </button>
-                                    <button class="btn btn-danger" >
-                                      <CIcon :icon="cilTrash" size="md" @click="abrirModal('ELIMINAR',abogado.id)" />
+                                    <button class="btn btn-danger text-light "  @click="abrirModal('ELIMINAR',abogado.id)" >
+                                      <CIcon :icon="cilTrash" size="md" />
                                     </button>
                                   </td>
                               </tr>

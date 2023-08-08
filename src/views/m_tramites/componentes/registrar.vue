@@ -98,7 +98,7 @@
                       </select>
                   </div>
                   <div class="col-md-1 col-2 d-flex align-items-end mt-1" >
-                      <button class="btn btn-info" >+</button>
+                      <button class="btn btn-info" @click="verPretencion()" type="button" >+</button>
                   </div>
                   <div class="col-md-6 mt-1">
                       <span>Valor Medida</span>
@@ -242,6 +242,10 @@ export default {
         }
       },
 
+      verPretencion(){
+        alert('HOLA')
+      },
+
       registrarTramite()
       {
 
@@ -337,7 +341,7 @@ export default {
           })
       },
       cargarJuzgados(){
-        postFetch(ruta_servidor+'juzgado/retornarjuzgadobasico',null)
+        postFetch(ruta_servidor+'tramite/retornarjuzgadobasico',null)
         .then(res=>{
 
             if(res.status == 200 ){
@@ -364,11 +368,9 @@ export default {
       cargarTipoPretenciones(){//
           postFetch(ruta_servidor+'tipotramites/retornartipopretenciones',null)
           .then(res=>{
-
               if(res.status == 200 ){
                   this.listaTipoPretenciones = res.pretenciones
               }else{
-
               }
           })
           .catch((e)=>{

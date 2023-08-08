@@ -67,6 +67,16 @@ const routes = [
         name: 'TipoTramite',
         component: () => import('@/views/m_tramites/tipotramite.vue'),
       },
+      {
+        path: '/juzgado/',
+        name: 'Juzgados',
+        component: () => import('@/views/m_juzgados/index.vue'),
+      },
+      {
+        path: '/reuniones/',
+        name: 'Reuniones',
+        component: () => import('@/views/m_citas/index.vue'),
+      },
 
     ],
   },

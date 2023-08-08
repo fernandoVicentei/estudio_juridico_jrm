@@ -22,6 +22,10 @@
             </div>
           </div>
 
+          <div class="col-md-12 mt-2" v-if="idTipoTramite!=''"  >
+            <span> <strong>Nota: </strong> Al momento de actualizar el registro, se volverá a habilitar para su uso. </span>
+          </div>
+
           <div class="mt-3 mb-2" >
             <ul>
                 <li   v-for="(error , i) in listaerrores" :key="i" class="text-danger">{{ error }}</li>
@@ -66,27 +70,45 @@ export default {
   },
   mounted(){
     this.idTramite = this.tramiteId
+    if( this.idTramite != '' ){
+      this.obtenerDatosTTramite()
+    }
   },
   methods:{
         enviarFormulario(e){
-          console.log( this.idTramite )
           let obj ={
             'nombre':this.nombre ,
             'descripcion':  this.descripcion  ,
             'precio': this.precio ,
-            }
+            'id': this.idTramite
+          }
           if( this.idTramite == '' || this.idTramite == 0 || this.idTramite == null ){
             this.registrarTTramite( obj )
           }else{
-
-
+            this.editarTTramite( obj )
           }
-           e.preventDefault();
-
+          e.preventDefault();
+        },
+        obtenerDatosTTramite(){
+            let obj = { 'idTipoTramite': this.idTramite  }
+            postFetch( ruta_servidor + 'tipotramites/buscartipotramite', obj )
+            .then((e)=>{
+                if(e.status == 422){
+                  this.listaerrores =  e.errors
+                }else{
+                  let data =  e.tipotramite
+                  this.nombre = data.proceso
+                  this.descripcion = data.descripcion
+                  this.precio = data.precioinicial
+                }
+            })
+            .catch((e)=>{
+              this.abrirError(e.message)
+            })
         },
         registrarTTramite(data){
           postFetch( ruta_servidor+'tipotramites/agregar', data )
-          .then((res)=>{
+          .then((res)=> {
             console.log( res );
             this.listaerrores = []
               if(res.status == 422){
@@ -95,12 +117,24 @@ export default {
                   this.abrirOk('El registro se guardo correctamente.')
               }
           })
-          .catch((err)=>{
+          .catch((err)=>  {
             this.abrirError(err.message)
           })
         },
-        editarTTramite(data){
-
+        editarTTramite(data)
+        {
+          postFetch( ruta_servidor+'tipotramites/actualizar', data )
+          .then((res)=> {
+            this.listaerrores = []
+              if(res.status == 422){
+                  this.listaerrores =  res.errors
+              }else{
+                  this.abrirOk('El registro se actualizo correctamente.')
+              }
+          })
+          .catch((err)=>  {
+            this.abrirError(err.message)
+          })
         },
         abrirOk(mensaje){
           this.mensaje = mensaje

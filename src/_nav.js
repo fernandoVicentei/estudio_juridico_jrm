@@ -35,6 +35,18 @@ export default [
   },
   {
     component: 'CNavItem',
+    name: 'Juzgados',
+    to: '/juzgado/',
+    icon: 'cil-drop',
+  },
+  {
+    component: 'CNavItem',
+    name: 'Reuniones',
+    to: '/reuniones/',
+    icon: 'cil-drop',
+  },
+  {
+    component: 'CNavItem',
     name: 'Typography',
     to: '/theme/typography',
     icon: 'cil-pencil',

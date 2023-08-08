@@ -5,7 +5,10 @@
     </CModalHeader>
     <CModalBody>
 
-      <RTTramite :tramiteId="idTTramite"  @cerrarModal="cerrarMTTramite()" />
+      <RTTramite :tramiteId="idTTtramite"  @cerrarModal="cerrarMTTramite()" v-if="tituloModal!= 'Eliminar Registro'"  />
+
+      <Eliminar :id="idTTtramite"  @cerrarModal="cerrarMTTramite()" v-if="tituloModal == 'Eliminar Registro'" />
+
 
     </CModalBody>
   </CModal>
@@ -13,11 +16,13 @@
 
 <script>
 import RTTramite from './registrarttramite.vue'
+import Eliminar from './eliminar.vue'
 
 export default {
   name:'Modal',
   components:{
     RTTramite,
+    Eliminar
   },
   data(){
     return{
